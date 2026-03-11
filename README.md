@@ -6,20 +6,27 @@
 
 ## Descrição
 
-Script em **Shell (Bash)** que cria um painel de monitoramento em tempo real no terminal. O programa exibe informações do sistema como usuários ativos, uso de CPU, memória, armazenamento, rede e temperatura, atualizando automaticamente a cada 5 segundos.
+Script em **Shell (Bash)** que cria um painel de monitoramento em tempo real no terminal. O programa exibe informações do sistema como usuários ativos, uso de CPU, memória, armazenamento, rede e temperatura.
 
-O objetivo é fornecer uma visualização rápida e leve do estado da máquina diretamente no terminal.
+## Melhorias implementadas nesta revisão
 
-> Atenção: a leitura de temperatura requer o pacote `lm-sensors` instalado no sistema.
+- ✅ Suporte a parâmetros de execução:
+  - `--intervalo` para ajustar tempo de atualização
+  - `--target` para trocar host de teste de conectividade
+  - `--help` para ajuda rápida
+- ✅ Validação de intervalo para evitar entrada inválida
+- ✅ Fallbacks para comandos ausentes (`ip`, `ping`, `free`, `sensors`)
+- ✅ Tratamento de encerramento com `Ctrl+C` via `trap`
+- ✅ Saída com seções padronizadas e timestamp legível
 
 ---
 
-## Estrutura sugerida de pastas
+## Estrutura
 
-```
+```text
 README.md
 LICENSE
-└── system-panel.sh
+system-panel.sh
 ```
 
 ---
@@ -33,36 +40,38 @@ O painel exibe:
 - Uptime e carga da CPU
 - Uso de memória RAM e swap
 - Uso de armazenamento em disco
-- Interfaces de rede e status da internet
-- Temperatura do hardware
-- Atualização automática a cada 5 segundos
+- Interfaces de rede e status de conectividade
+- Temperatura do hardware (quando `lm-sensors` estiver disponível)
+- Atualização automática por intervalo configurável
 
 ---
 
-## Instalação (passo a passo)
+## Uso
 
-1. Clone o repositório:
-
-```bash
-git clone https://github.com/seu-usuario/system-panel.git
-cd system-panel
-```
-
-2. Dê permissão de execução ao script:
+1. Dê permissão de execução ao script:
 
 ```bash
 chmod +x system-panel.sh
 ```
 
-3. Execute:
+2. Execute com configuração padrão:
 
 ```bash
 ./system-panel.sh
 ```
 
+3. Exemplos de uso com opções:
+
+```bash
+./system-panel.sh --intervalo 2
+./system-panel.sh --target 1.1.1.1
+./system-panel.sh --intervalo 3 --target 8.8.4.4
+./system-panel.sh --help
+```
+
 Para encerrar o monitoramento:
 
-```
+```text
 Ctrl + C
 ```
 
@@ -70,16 +79,23 @@ Ctrl + C
 
 ## Dependências
 
-Ferramentas utilizadas (geralmente já presentes em Linux):
+Ferramentas base (normalmente já presentes em Linux):
 
-```
+```text
 bash
 coreutils
 iproute2
-lm-sensors (opcional)
+iputils-ping
+procps
 ```
 
-### Instalar lm-sensors (Ubuntu/Debian)
+Dependência opcional para temperatura:
+
+```text
+lm-sensors
+```
+
+### Instalar `lm-sensors` (Ubuntu/Debian)
 
 ```bash
 sudo apt install lm-sensors
@@ -88,26 +104,10 @@ sudo sensors-detect
 
 ---
 
-## Funcionamento interno
+## Sugestões de melhorias futuras
 
-O script executa um loop infinito que:
-
-1. Limpa o terminal
-2. Coleta métricas do sistema com comandos nativos
-3. Exibe os dados organizados em painel
-4. Aguarda 5 segundos
-5. Repete o processo
-
-Esse ciclo mantém o monitoramento em tempo real.
-
----
-
-## Boas práticas implementadas
-
-- Uso de comandos nativos leves
-- Atualização periódica controlada
-- Verificação de conectividade com internet
-- Filtragem de informações relevantes
-- Exibição organizada para leitura rápida
-
----
+- Exportar métricas em JSON/CSV para integração com scripts externos
+- Adicionar modo `--once` para execução única (útil para automação)
+- Mostrar top processos por CPU e RAM
+- Adicionar destaque de cores por faixas de uso (normal/alerta/crítico)
+- Criar versão com `watch`/`tput` para layout mais rico mantendo Bash puro
